@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { nextStep } from './next-step';
+
 export default {
   props: {
     difficult: {
