@@ -45,6 +45,9 @@ export default {
   },
 
   methods: {
+    emitScore() {
+      return this.$emit('score', this.score);
+    },
     activateTile(color) {
       const tile = filterTile(this.$refs.tileList, color);
       const sound = filterSound(this.soundList, color);
@@ -62,7 +65,7 @@ export default {
     nextRound() {
       this.level += 1;
       this.score = this.level;
-
+      this.emitScore();
       this.info.textContent = 'Wait for the computer';
 
       const nextSequence = [...this.sequence];
