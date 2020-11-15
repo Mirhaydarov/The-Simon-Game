@@ -153,6 +153,12 @@ export default {
   mounted() {
     this.initSimon();
   },
+
+  watch: {
+    score(scoreEqualZero) {
+      if (this.endGame || this.gameOver) this.$emit('score', scoreEqualZero);
+    },
+  },
 };
 </script>
 

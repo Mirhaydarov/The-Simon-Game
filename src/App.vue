@@ -1,11 +1,20 @@
 <template>
   <div id="app">
     <Header />
+    <Simon
+      :difficult="difficult"
+      :startBtn="startBtn"
+      :soundList="soundList"
+      :info="info"
+      @score="score = $event"
+      @startGame="startGame = $event" />
+
     <GameInfo
       :score="score"
       :startGame="startGame"
       @startBtn="startBtn = $event"
       @info="info = $event" />
+
     <GameOptions @difficult="difficult = $event"/>
     <SimonSound @soundList="soundList = $event" />
   </div>
@@ -13,6 +22,7 @@
 
 <script>
 import Header from './components/Title/index.vue';
+import Simon from './components/Simon/index.vue';
 import GameInfo from './components/GameInfo/index.vue';
 import GameOptions from './components/GameOptions/index.vue';
 import SimonSound from './components/SimonSound/index.vue';
@@ -33,6 +43,7 @@ export default {
 
   components: {
     Header,
+    Simon,
     GameInfo,
     GameOptions,
     SimonSound,
