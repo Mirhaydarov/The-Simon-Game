@@ -41,6 +41,7 @@ export default {
       level: 0,
       sequence: [],
       humanSequence: [],
+      totalLevels: 35,
     };
   },
 
@@ -55,6 +56,12 @@ export default {
       this.startBtn.classList.remove('hidden');
       this.info.classList.add('hidden');
       return true;
+    },
+    endGame(humanSequence) {
+      if (humanSequence.length === this.totalLevels) {
+        return this.resetGame(`Congrats! You completed all ${this.totalLevels} levels`);
+      }
+      return false;
     },
     emitScore() {
       return this.$emit('score', this.score);
