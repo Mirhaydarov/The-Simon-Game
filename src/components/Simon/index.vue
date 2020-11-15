@@ -57,6 +57,14 @@ export default {
       this.info.classList.add('hidden');
       return true;
     },
+    activeTileAfterClick(tileList, tiles) {
+      const tile = filterTile(tileList, tiles);
+      tile.classList.add('active');
+
+      setTimeout(() => {
+        tile.classList.remove('active');
+      }, 100);
+    },
     endGame(humanSequence) {
       if (humanSequence.length === this.totalLevels) {
         return this.resetGame(`Congrats! You completed all ${this.totalLevels} levels`);
