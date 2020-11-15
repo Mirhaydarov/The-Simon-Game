@@ -1,5 +1,5 @@
 <template>
-  <main class="simon">
+  <main class="simon" @click="handleClick($event.target)">
     <ul ref="tileList">
       <li class="red" data-tile="red"></li>
       <li class="blue" data-tile="blue"></li>
@@ -64,6 +64,35 @@ export default {
       setTimeout(() => {
         tile.classList.remove('active');
       }, 100);
+    },
+    handleClick(target) {
+      if (this.score === 0) return;
+
+      const { tile } = target.dataset;
+
+      const index = this.humanSequence.push(tile) - 1;
+      this.activeTileAfterClick(this.$refs.tileList, tile);
+
+      const sound = filterSound(this.soundList, tile);
+      playSound(sound);
+
+      const remainingTaps = this.sequence.length - this.humanSequence.length;
+
+      if (this.gameOver(this.humanSequence, this.sequence, index)) return;
+
+      if (this.humanSequence.length === this.sequence.length) {
+        if (this.endGame(this.humanSequence)) return;
+
+        this.humanSequence = [];
+        this.info.textContent = 'Success! Keep going!';
+
+        setTimeout(() => {
+          this.nextRound();
+        }, 1000);
+        return;
+      }
+
+      showTotalTurn(remainingTaps)(this.info);
     },
     endGame(humanSequence) {
       if (humanSequence.length === this.totalLevels) {
