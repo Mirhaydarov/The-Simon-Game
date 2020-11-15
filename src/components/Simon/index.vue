@@ -12,9 +12,11 @@
 <script>
 import { sum } from './sum';
 import { nextStep } from './next-step';
+import { playRound } from './play-round';
 import { playSound } from './play-sound';
 import { filterTile } from './filter-tile';
 import { filterSound } from './filter-sound';
+import { showTotalTurn } from './show-total-turn';
 
 export default {
   props: {
@@ -54,6 +56,9 @@ export default {
         tile.classList.remove('active');
       }, sum(this.difficult, 1000));
     },
+    humanTurn(level) {
+      showTotalTurn(level)(this.info);
+    },
     nextRound() {
       this.level += 1;
       this.score = this.level;
@@ -62,6 +67,8 @@ export default {
 
       const nextSequence = [...this.sequence];
       nextSequence.push(nextStep());
+      playRound(nextSequence, this.activateTile, this.difficult);
+      this.sequence = [...nextSequence];
     },
     initSimon() {
       const startGame = () => {
