@@ -69,6 +69,10 @@ export default {
       nextSequence.push(nextStep());
       playRound(nextSequence, this.activateTile, this.difficult);
       this.sequence = [...nextSequence];
+
+      setTimeout(() => {
+        this.humanTurn(this.level);
+      }, this.level * sum(this.difficult, 1100) + sum(this.difficult, 1100));
     },
     initSimon() {
       const startGame = () => {
