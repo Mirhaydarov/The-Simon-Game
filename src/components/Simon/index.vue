@@ -63,6 +63,12 @@ export default {
       }
       return false;
     },
+    gameOver(humanSequence, sequence, index) {
+      if (humanSequence[index] !== sequence[index]) {
+        return this.resetGame('Oops! Game over');
+      }
+      return false;
+    },
     emitScore() {
       return this.$emit('score', this.score);
     },
