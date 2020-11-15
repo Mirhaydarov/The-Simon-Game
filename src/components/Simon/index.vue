@@ -39,11 +39,21 @@ export default {
   },
 
   methods: {
+    nextRound() {
+      this.level += 1;
+      this.score = this.level;
+
+      this.info.textContent = 'Wait for the computer';
+
+      const nextSequence = [...this.sequence];
+      nextSequence.push(nextStep());
+    },
     initSimon() {
       const startGame = () => {
         this.startBtn.classList.add('hidden');
         this.info.classList.remove('hidden');
         this.info.textContent = 'Wait for the computer';
+        this.nextRound();
       };
 
       this.$emit('startGame', startGame);
