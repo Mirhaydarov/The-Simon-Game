@@ -45,6 +45,17 @@ export default {
   },
 
   methods: {
+    resetGame(text) {
+      alert(text);
+      this.sequence = [];
+      this.humanSequence = [];
+      this.level = 0;
+      this.score = 0;
+
+      this.startBtn.classList.remove('hidden');
+      this.info.classList.add('hidden');
+      return true;
+    },
     emitScore() {
       return this.$emit('score', this.score);
     },
