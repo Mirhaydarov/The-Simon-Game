@@ -10,7 +10,11 @@
 </template>
 
 <script>
+import { sum } from './sum';
 import { nextStep } from './next-step';
+import { playSound } from './play-sound';
+import { filterTile } from './filter-tile';
+import { filterSound } from './filter-sound';
 
 export default {
   props: {
@@ -39,6 +43,17 @@ export default {
   },
 
   methods: {
+    activateTile(color) {
+      const tile = filterTile(this.$refs.tileList, color);
+      const sound = filterSound(this.soundList, color);
+
+      tile.classList.add('active');
+      playSound(sound);
+
+      setTimeout(() => {
+        tile.classList.remove('active');
+      }, sum(this.difficult, 1000));
+    },
     nextRound() {
       this.level += 1;
       this.score = this.level;
