@@ -1,18 +1,41 @@
 <template>
   <div id="app">
+    <Header />
+    <GameInfo
+      :score="score"
+      :startGame="startGame"
+      @startBtn="startBtn = $event"
+      @info="info = $event" />
+    <GameOptions @difficult="difficult = $event"/>
+    <SimonSound @soundList="soundList = $event" />
   </div>
 </template>
 
 <script>
+import Header from './components/Title/index.vue';
+import GameInfo from './components/GameInfo/index.vue';
+import GameOptions from './components/GameOptions/index.vue';
+import SimonSound from './components/SimonSound/index.vue';
+
 export default {
   name: 'App',
 
   data() {
     return {
+      difficult: 'normal',
+      score: 0,
+      startBtn: null,
+      soundList: null,
+      info: null,
+      startGame: () => {},
     };
   },
 
   components: {
+    Header,
+    GameInfo,
+    GameOptions,
+    SimonSound,
   },
 };
 </script>
