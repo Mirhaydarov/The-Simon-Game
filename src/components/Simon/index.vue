@@ -1,10 +1,12 @@
 <template>
   <main class="simon" @click="handleClick($event.target)">
     <ul ref="tileList">
-      <li class="red" data-tile="red"></li>
-      <li class="blue" data-tile="blue"></li>
-      <li class="yellow" data-tile="yellow"></li>
-      <li class="green" data-tile="green"></li>
+      <li
+        v-for="{ className, data } of tileList"
+        :key="data"
+        :class="className"
+        :data-tile="data"
+      ></li>
     </ul>
   </main>
 </template>
@@ -18,18 +20,10 @@ import { filterTile } from './filter-tile';
 import { filterSound } from './filter-sound';
 import { showTotalTurn } from './show-total-turn';
 
+import { eventEmitter } from '../../main';
+
 export default {
   props: {
-    difficult: {
-      type: String,
-      required: true,
-    },
-    info: {
-      type: Element,
-    },
-    startBtn: {
-      type: Element,
-    },
     soundList: {
       type: Element,
     },
@@ -37,11 +31,20 @@ export default {
 
   data() {
     return {
+      tileList: [
+        { className: 'red', data: 'red' },
+        { className: 'blue', data: 'blue' },
+        { className: 'yellow', data: 'yellow' },
+        { className: 'green', data: 'green' },
+      ],
       score: 0,
       level: 0,
       sequence: [],
       humanSequence: [],
       totalLevels: 35,
+      difficult: 'normal',
+      info: null,
+      startBtn: null,
     };
   },
 
@@ -71,6 +74,8 @@ export default {
       const { tile } = target.dataset;
 
       const index = this.humanSequence.push(tile) - 1;
+      console.log('handleClick -> index', this.humanSequence);
+      console.log('handleClick -> index', index);
       this.activeTileAfterClick(this.$refs.tileList, tile);
 
       const sound = filterSound(this.soundList, tile);
@@ -107,7 +112,7 @@ export default {
       return false;
     },
     emitScore() {
-      return this.$emit('score', this.score);
+      eventEmitter.$emit('score', this.score);
     },
     activateTile(color) {
       const tile = filterTile(this.$refs.tileList, color);
@@ -127,7 +132,7 @@ export default {
       this.level += 1;
       this.score = this.level;
       this.emitScore();
-      this.info.textContent = 'Wait for the computer';
+      this.setInfo('Wait for the computer');
 
       const nextSequence = [...this.sequence];
       nextSequence.push(nextStep());
@@ -138,20 +143,23 @@ export default {
         this.humanTurn(this.level);
       }, this.level * sum(this.difficult, 1100) + sum(this.difficult, 1100));
     },
-    initSimon() {
-      const startGame = () => {
-        this.startBtn.classList.add('hidden');
-        this.info.classList.remove('hidden');
-        this.info.textContent = 'Wait for the computer';
-        this.nextRound();
-      };
-
-      this.$emit('startGame', startGame);
+    setInfo(message) {
+      eventEmitter.$emit('showInfo', message);
+    },
+    viewStartBtn() {
+      eventEmitter.$emit('hideStartBtn');
     },
   },
 
-  mounted() {
-    this.initSimon();
+  created() {
+    eventEmitter.$on('startGames', () => {
+      this.viewStartBtn();
+      this.setInfo('Wait for the computer');
+      this.nextRound();
+    });
+    eventEmitter.$on('difficult', (payload) => {
+      this.difficult = payload;
+    });
   },
 
   watch: {
