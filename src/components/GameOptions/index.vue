@@ -1,29 +1,42 @@
 <template>
   <section class="game-options">
     <h2>{{ title }}</h2>
-    <input type="radio" value="normal" v-model="inputList">
-      Normal
-    <br>
-    <input type="radio" value="middle" v-model="inputList">
-      Middle
-    <br>
-    <input type="radio" value="hard" v-model="inputList">
-      Hard
-    <br>
+    <label
+      class="game-options__label"
+      v-for="{ label, value } of inputLabel"
+      :key="label"
+    >
+      <input
+        type="radio"
+        :value="value"
+        @click="changeDifficult($event)"
+        v-model="inputList">{{ label }}<br>
+    </label>
   </section>
 </template>
 
 <script>
+import { eventEmitter } from '../../main';
+
 export default {
   data() {
     return {
       title: 'Game Options:',
+      inputLabel: [
+        { label: 'Normal', value: 'normal' },
+        { label: 'Middle', value: 'middle' },
+        { label: 'Hard', value: 'hard' },
+      ],
       inputList: 'normal',
     };
   },
 
-  updated() {
-    this.$emit('difficult', this.inputList);
+  methods: {
+    changeDifficult({ target }) {
+      const { value } = target;
+      eventEmitter.$emit('difficult', value);
+    },
   },
+
 };
 </script>
