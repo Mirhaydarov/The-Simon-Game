@@ -57,7 +57,7 @@ export default {
       this.score = 0;
 
       this.viewStartBtn();
-      this.setInfo('');
+      this.setInfo({ infoBoolean: false, message: '' });
       return true;
     },
     activeTileAfterClick(tileList, tiles) {
@@ -126,13 +126,15 @@ export default {
       }, sum(this.difficult, 1000));
     },
     humanTurn(level) {
-      showTotalTurn(level)(this.info);
+      // eslint-disable-next-line no-unused-vars
+      const message = `Your turn: ${level} Tap${level > 1 ? 's' : ''}`;
+      this.setInfo({ infoBoolean: true, message });
     },
     nextRound() {
       this.level += 1;
       this.score = this.level;
       this.setScore(this.score);
-      this.setInfo('Wait for the computer');
+      this.setInfo({ infoBoolean: true, message: 'Wait for the computer' });
 
       const nextSequence = [...this.sequence];
       nextSequence.push(nextStep());
@@ -154,7 +156,6 @@ export default {
   created() {
     eventEmitter.$on('startGames', () => {
       this.viewStartBtn();
-      this.setInfo('Wait for the computer');
       this.nextRound();
     });
     eventEmitter.$on('difficult', (payload) => {

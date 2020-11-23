@@ -37,12 +37,21 @@ export default {
       this.showStartBtn = !this.showStartBtn;
     });
     eventEmitter.$on('showInfo', (payload) => {
-      this.showInfo = !this.showInfo;
-      this.infoMessage = (this.showInfo) ? payload : '';
+      const { infoBoolean, message } = payload;
+
+      this.showInfo = infoBoolean;
+      this.infoMessage = (this.showInfo) ? message : '';
     });
     eventEmitter.$on('score', (payload) => {
       this.score = payload;
     });
+  },
+
+  watch: {
+    infoMessage(value) {
+      console.log(value);
+      this.showInfo = value;
+    },
   },
 };
 </script>
