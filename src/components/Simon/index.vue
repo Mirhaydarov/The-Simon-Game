@@ -85,10 +85,10 @@ export default {
 
       if (this.humanSequence.length === this.sequence.length) {
         if (this.endGame(this.humanSequence)) return;
-        const successMessage = 'Success! Keep going!';
+        const message = 'Success! Keep going!';
 
         this.humanSequence = [];
-        this.setInfo(successMessage);
+        this.setInfo({ infoBoolean: true, message });
 
         setTimeout(() => {
           this.nextRound();
