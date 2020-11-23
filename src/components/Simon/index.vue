@@ -18,7 +18,6 @@ import { playRound } from './play-round';
 import { playSound } from './play-sound';
 import { filterTile } from './filter-tile';
 import { filterSound } from './filter-sound';
-import { showTotalTurn } from './show-total-turn';
 
 import { eventEmitter } from '../../main';
 
@@ -56,7 +55,8 @@ export default {
       this.level = 0;
       this.score = 0;
 
-      this.viewStartBtn();
+      this.setScore(0);
+      this.viewStartBtn(true);
       this.setInfo({ infoBoolean: false, message: '' });
       return true;
     },
@@ -74,8 +74,6 @@ export default {
       const { tile } = target.dataset;
 
       const index = this.humanSequence.push(tile) - 1;
-      console.log('handleClick -> index', this.humanSequence);
-      console.log('handleClick -> index', index);
       this.activeTileAfterClick(this.$refs.tileList, tile);
 
       const sound = filterSound(this.soundList, tile);
@@ -87,17 +85,17 @@ export default {
 
       if (this.humanSequence.length === this.sequence.length) {
         if (this.endGame(this.humanSequence)) return;
+        const successMessage = 'Success! Keep going!';
 
         this.humanSequence = [];
-        this.info.textContent = 'Success! Keep going!';
+        this.setInfo(successMessage);
 
         setTimeout(() => {
           this.nextRound();
         }, 1000);
         return;
       }
-
-      showTotalTurn(remainingTaps)(this.info);
+      this.humanTurn(remainingTaps);
     },
     endGame(humanSequence) {
       if (humanSequence.length === this.totalLevels) {
@@ -111,9 +109,6 @@ export default {
       }
       return false;
     },
-    setScore(value) {
-      eventEmitter.$emit('score', value);
-    },
     activateTile(color) {
       const tile = filterTile(this.$refs.tileList, color);
       const sound = filterSound(this.soundList, color);
@@ -124,11 +119,6 @@ export default {
       setTimeout(() => {
         tile.classList.remove('active');
       }, sum(this.difficult, 1000));
-    },
-    humanTurn(level) {
-      // eslint-disable-next-line no-unused-vars
-      const message = `Your turn: ${level} Tap${level > 1 ? 's' : ''}`;
-      this.setInfo({ infoBoolean: true, message });
     },
     nextRound() {
       this.level += 1;
@@ -145,28 +135,29 @@ export default {
         this.humanTurn(this.level);
       }, this.level * sum(this.difficult, 1100) + sum(this.difficult, 1100));
     },
-    setInfo(message) {
-      eventEmitter.$emit('showInfo', message);
+    setScore(value) {
+      eventEmitter.$emit('score', value);
     },
-    viewStartBtn() {
-      eventEmitter.$emit('hideStartBtn');
+    humanTurn(level) {
+      const message = `Your turn: ${level} Tap${level > 1 ? 's' : ''}`;
+      this.setInfo({ infoBoolean: true, message });
+    },
+    setInfo(message) {
+      eventEmitter.$emit('setInfo', message);
+    },
+    viewStartBtn(btnBoolean) {
+      eventEmitter.$emit('hideStartBtn', btnBoolean);
     },
   },
 
   created() {
-    eventEmitter.$on('startGames', () => {
-      this.viewStartBtn();
+    eventEmitter.$on('startGame', () => {
+      this.viewStartBtn(false);
       this.nextRound();
     });
     eventEmitter.$on('difficult', (payload) => {
       this.difficult = payload;
     });
-  },
-
-  watch: {
-    score(scoreEqualZero) {
-      if (this.endGame || this.gameOver) this.setScore(scoreEqualZero);
-    },
   },
 };
 </script>
