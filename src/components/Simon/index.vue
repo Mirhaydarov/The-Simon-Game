@@ -1,10 +1,12 @@
 <template>
   <main class="simon" @click="handleClick($event.target)">
     <ul ref="tileList">
-      <li class="red" data-tile="red"></li>
-      <li class="blue" data-tile="blue"></li>
-      <li class="yellow" data-tile="yellow"></li>
-      <li class="green" data-tile="green"></li>
+      <li
+        v-for="{ className, data } of tileList"
+        :key="data"
+        :class="className"
+        :data-tile="data"
+      ></li>
     </ul>
   </main>
 </template>
@@ -16,20 +18,11 @@ import { playRound } from './play-round';
 import { playSound } from './play-sound';
 import { filterTile } from './filter-tile';
 import { filterSound } from './filter-sound';
-import { showTotalTurn } from './show-total-turn';
+
+import { eventEmitter } from '../../main';
 
 export default {
   props: {
-    difficult: {
-      type: String,
-      required: true,
-    },
-    info: {
-      type: Element,
-    },
-    startBtn: {
-      type: Element,
-    },
     soundList: {
       type: Element,
     },
@@ -37,11 +30,18 @@ export default {
 
   data() {
     return {
+      tileList: [
+        { className: 'red', data: 'red' },
+        { className: 'blue', data: 'blue' },
+        { className: 'yellow', data: 'yellow' },
+        { className: 'green', data: 'green' },
+      ],
       score: 0,
       level: 0,
       sequence: [],
       humanSequence: [],
       totalLevels: 35,
+      difficult: 'normal',
     };
   },
 
@@ -53,8 +53,9 @@ export default {
       this.level = 0;
       this.score = 0;
 
-      this.startBtn.classList.remove('hidden');
-      this.info.classList.add('hidden');
+      this.setScore(0);
+      this.viewStartBtn(true);
+      this.setInfo({ infoBoolean: false, message: '' });
       return true;
     },
     activeTileAfterClick(tileList, tiles) {
@@ -82,17 +83,17 @@ export default {
 
       if (this.humanSequence.length === this.sequence.length) {
         if (this.endGame(this.humanSequence)) return;
+        const message = 'Success! Keep going!';
 
         this.humanSequence = [];
-        this.info.textContent = 'Success! Keep going!';
+        this.setInfo({ infoBoolean: true, message });
 
         setTimeout(() => {
           this.nextRound();
         }, 1000);
         return;
       }
-
-      showTotalTurn(remainingTaps)(this.info);
+      this.humanTurn(remainingTaps);
     },
     endGame(humanSequence) {
       if (humanSequence.length === this.totalLevels) {
@@ -106,9 +107,6 @@ export default {
       }
       return false;
     },
-    emitScore() {
-      return this.$emit('score', this.score);
-    },
     activateTile(color) {
       const tile = filterTile(this.$refs.tileList, color);
       const sound = filterSound(this.soundList, color);
@@ -120,14 +118,11 @@ export default {
         tile.classList.remove('active');
       }, sum(this.difficult, 1000));
     },
-    humanTurn(level) {
-      showTotalTurn(level)(this.info);
-    },
     nextRound() {
       this.level += 1;
       this.score = this.level;
-      this.emitScore();
-      this.info.textContent = 'Wait for the computer';
+      this.setScore(this.score);
+      this.setInfo({ infoBoolean: true, message: 'Wait for the computer' });
 
       const nextSequence = [...this.sequence];
       nextSequence.push(nextStep());
@@ -138,26 +133,29 @@ export default {
         this.humanTurn(this.level);
       }, this.level * sum(this.difficult, 1100) + sum(this.difficult, 1100));
     },
-    initSimon() {
-      const startGame = () => {
-        this.startBtn.classList.add('hidden');
-        this.info.classList.remove('hidden');
-        this.info.textContent = 'Wait for the computer';
-        this.nextRound();
-      };
-
-      this.$emit('startGame', startGame);
+    setScore(value) {
+      eventEmitter.$emit('score', value);
+    },
+    humanTurn(level) {
+      const message = `Your turn: ${level} Tap${level > 1 ? 's' : ''}`;
+      this.setInfo({ infoBoolean: true, message });
+    },
+    setInfo(message) {
+      eventEmitter.$emit('setInfo', message);
+    },
+    viewStartBtn(btnBoolean) {
+      eventEmitter.$emit('hideStartBtn', btnBoolean);
     },
   },
 
-  mounted() {
-    this.initSimon();
-  },
-
-  watch: {
-    score(scoreEqualZero) {
-      if (this.endGame || this.gameOver) this.$emit('score', scoreEqualZero);
-    },
+  created() {
+    eventEmitter.$on('startGame', () => {
+      this.viewStartBtn(false);
+      this.nextRound();
+    });
+    eventEmitter.$on('difficult', (payload) => {
+      this.difficult = payload;
+    });
   },
 };
 </script>
