@@ -56,8 +56,8 @@ export default {
       this.level = 0;
       this.score = 0;
 
-      this.startBtn.classList.remove('hidden');
-      this.info.classList.add('hidden');
+      this.viewStartBtn();
+      this.setInfo('');
       return true;
     },
     activeTileAfterClick(tileList, tiles) {
@@ -111,8 +111,8 @@ export default {
       }
       return false;
     },
-    emitScore() {
-      eventEmitter.$emit('score', this.score);
+    setScore(value) {
+      eventEmitter.$emit('score', value);
     },
     activateTile(color) {
       const tile = filterTile(this.$refs.tileList, color);
@@ -131,7 +131,7 @@ export default {
     nextRound() {
       this.level += 1;
       this.score = this.level;
-      this.emitScore();
+      this.setScore(this.score);
       this.setInfo('Wait for the computer');
 
       const nextSequence = [...this.sequence];
@@ -164,7 +164,7 @@ export default {
 
   watch: {
     score(scoreEqualZero) {
-      if (this.endGame || this.gameOver) this.$emit('score', scoreEqualZero);
+      if (this.endGame || this.gameOver) this.setScore(scoreEqualZero);
     },
   },
 };

@@ -3,13 +3,12 @@
     <h2>Round: <span data-round="0">{{ score }}</span></h2>
     <button
       v-show="showStartBtn"
-      class="start" ref="startBtn"
+      class="start"
       @click="startGame"
     >Start</button>
     <span
       v-show="showInfo"
       class="info"
-      ref="info"
     >{{ infoMessage }}</span>
   </section>
 </template>
@@ -18,18 +17,12 @@
 import { eventEmitter } from '../../main';
 
 export default {
-  props: {
-    score: {
-      type: Number,
-      required: true,
-    },
-  },
-
   data() {
     return {
+      score: 0,
+      infoMessage: '',
       showStartBtn: true,
       showInfo: false,
-      infoMessage: '',
     };
   },
 
@@ -46,6 +39,9 @@ export default {
     eventEmitter.$on('showInfo', (payload) => {
       this.showInfo = !this.showInfo;
       this.infoMessage = (this.showInfo) ? payload : '';
+    });
+    eventEmitter.$on('score', (payload) => {
+      this.score = payload;
     });
   },
 };
