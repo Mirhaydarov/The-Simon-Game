@@ -1,12 +1,10 @@
 <template>
   <main class="simon" @click="handleClick($event.target)">
     <ul ref="tileList">
-      <li
-        v-for="{ className, data } of tileList"
-        :key="data"
-        :class="className"
-        :data-tile="data"
-      ></li>
+      <li class="red" data-tile="red"></li>
+      <li class="blue" data-tile="blue"></li>
+      <li class="yellow" data-tile="yellow"></li>
+      <li class="green" data-tile="green"></li>
     </ul>
   </main>
 </template>
@@ -20,10 +18,18 @@ import { filterTile } from './filter-tile';
 import { filterSound } from './filter-sound';
 import { showTotalTurn } from './show-total-turn';
 
-import { eventEmitter } from '../../main';
-
 export default {
   props: {
+    difficult: {
+      type: String,
+      required: true,
+    },
+    info: {
+      type: Element,
+    },
+    startBtn: {
+      type: Element,
+    },
     soundList: {
       type: Element,
     },
@@ -31,20 +37,11 @@ export default {
 
   data() {
     return {
-      tileList: [
-        { className: 'red', data: 'red' },
-        { className: 'blue', data: 'blue' },
-        { className: 'yellow', data: 'yellow' },
-        { className: 'green', data: 'green' },
-      ],
       score: 0,
       level: 0,
       sequence: [],
       humanSequence: [],
       totalLevels: 35,
-      difficult: 'normal',
-      info: null,
-      startBtn: null,
     };
   },
 
@@ -56,8 +53,8 @@ export default {
       this.level = 0;
       this.score = 0;
 
-      this.viewStartBtn();
-      this.setInfo({ infoBoolean: false, message: '' });
+      this.startBtn.classList.remove('hidden');
+      this.info.classList.add('hidden');
       return true;
     },
     activeTileAfterClick(tileList, tiles) {
@@ -74,8 +71,6 @@ export default {
       const { tile } = target.dataset;
 
       const index = this.humanSequence.push(tile) - 1;
-      console.log('handleClick -> index', this.humanSequence);
-      console.log('handleClick -> index', index);
       this.activeTileAfterClick(this.$refs.tileList, tile);
 
       const sound = filterSound(this.soundList, tile);
@@ -111,8 +106,8 @@ export default {
       }
       return false;
     },
-    setScore(value) {
-      eventEmitter.$emit('score', value);
+    emitScore() {
+      return this.$emit('score', this.score);
     },
     activateTile(color) {
       const tile = filterTile(this.$refs.tileList, color);
@@ -126,15 +121,13 @@ export default {
       }, sum(this.difficult, 1000));
     },
     humanTurn(level) {
-      // eslint-disable-next-line no-unused-vars
-      const message = `Your turn: ${level} Tap${level > 1 ? 's' : ''}`;
-      this.setInfo({ infoBoolean: true, message });
+      showTotalTurn(level)(this.info);
     },
     nextRound() {
       this.level += 1;
       this.score = this.level;
-      this.setScore(this.score);
-      this.setInfo({ infoBoolean: true, message: 'Wait for the computer' });
+      this.emitScore();
+      this.info.textContent = 'Wait for the computer';
 
       const nextSequence = [...this.sequence];
       nextSequence.push(nextStep());
@@ -145,27 +138,25 @@ export default {
         this.humanTurn(this.level);
       }, this.level * sum(this.difficult, 1100) + sum(this.difficult, 1100));
     },
-    setInfo(message) {
-      eventEmitter.$emit('showInfo', message);
-    },
-    viewStartBtn() {
-      eventEmitter.$emit('hideStartBtn');
+    initSimon() {
+      const startGame = () => {
+        this.startBtn.classList.add('hidden');
+        this.info.classList.remove('hidden');
+        this.info.textContent = 'Wait for the computer';
+        this.nextRound();
+      };
+
+      this.$emit('startGame', startGame);
     },
   },
 
-  created() {
-    eventEmitter.$on('startGames', () => {
-      this.viewStartBtn();
-      this.nextRound();
-    });
-    eventEmitter.$on('difficult', (payload) => {
-      this.difficult = payload;
-    });
+  mounted() {
+    this.initSimon();
   },
 
   watch: {
     score(scoreEqualZero) {
-      if (this.endGame || this.gameOver) this.setScore(scoreEqualZero);
+      if (this.endGame || this.gameOver) this.$emit('score', scoreEqualZero);
     },
   },
 };

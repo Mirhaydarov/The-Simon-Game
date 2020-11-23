@@ -1,11 +1,21 @@
 <template>
   <div id="app">
     <Header />
-    <Simon :soundList="soundList" />
+    <Simon
+      :difficult="difficult"
+      :startBtn="startBtn"
+      :soundList="soundList"
+      :info="info"
+      @score="score = $event"
+      @startGame="startGame = $event" />
 
-    <GameInfo />
+    <GameInfo
+      :score="score"
+      :startGame="startGame"
+      @startBtn="startBtn = $event"
+      @info="info = $event" />
 
-    <GameOptions />
+    <GameOptions @difficult="difficult = $event"/>
     <SimonSound @soundList="soundList = $event" />
   </div>
 </template>
@@ -22,7 +32,12 @@ export default {
 
   data() {
     return {
+      difficult: 'normal',
+      score: 0,
+      startBtn: null,
       soundList: null,
+      info: null,
+      startGame: () => {},
     };
   },
 
