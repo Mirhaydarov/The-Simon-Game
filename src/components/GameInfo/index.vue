@@ -28,30 +28,21 @@ export default {
 
   methods: {
     startGame() {
-      eventEmitter.$emit('startGames');
+      eventEmitter.$emit('startGame');
     },
   },
 
   created() {
-    eventEmitter.$on('hideStartBtn', () => {
-      this.showStartBtn = !this.showStartBtn;
+    eventEmitter.$on('hideStartBtn', (payload) => {
+      this.showStartBtn = payload;
     });
-    eventEmitter.$on('showInfo', (payload) => {
-      const { infoBoolean, message } = payload;
-
+    eventEmitter.$on('setInfo', ({ infoBoolean, message = '' }) => {
       this.showInfo = infoBoolean;
       this.infoMessage = (this.showInfo) ? message : '';
     });
     eventEmitter.$on('score', (payload) => {
       this.score = payload;
     });
-  },
-
-  watch: {
-    infoMessage(value) {
-      console.log(value);
-      this.showInfo = value;
-    },
   },
 };
 </script>
