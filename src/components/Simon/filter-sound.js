@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export const filterSound = (soundList, value) => {
   const copySoundList = [...soundList.childNodes];
 
