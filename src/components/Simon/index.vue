@@ -6,7 +6,7 @@
         :key="data"
         :class="[className, { 'active': (currentTile === data && isTileActive) }]"
         :data-tile="data"
-      >{{ currentTile }}</li>
+      ></li>
     </ul>
   </main>
 </template>
@@ -19,12 +19,6 @@ import { playRound } from './play-round';
 import { eventEmitter } from '../../main';
 
 export default {
-  props: {
-    soundList: {
-      type: Element,
-    },
-  },
-
   data() {
     return {
       tileList: [
