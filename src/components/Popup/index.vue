@@ -24,7 +24,7 @@ export default {
     },
   },
   created() {
-    eventEmitter.$on('view', (payload) => {
+    eventEmitter.$on('viewModal', (payload) => {
       this.message = payload;
       this.show = true;
     });

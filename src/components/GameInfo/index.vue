@@ -33,14 +33,14 @@ export default {
   },
 
   created() {
-    eventEmitter.$on('hideStartBtn', (payload) => {
+    eventEmitter.$on('viewStartBtn', (payload) => {
       this.showStartBtn = payload;
     });
-    eventEmitter.$on('setInfo', ({ infoBoolean, message = '' }) => {
-      this.showInfo = infoBoolean;
+    eventEmitter.$on('setInfo', ({ show, message = '' }) => {
+      this.showInfo = show;
       this.infoMessage = (this.showInfo) ? message : '';
     });
-    eventEmitter.$on('score', (payload) => {
+    eventEmitter.$on('setScore', (payload) => {
       this.score = payload;
     });
   },

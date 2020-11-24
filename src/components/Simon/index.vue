@@ -39,8 +39,8 @@ export default {
   },
 
   methods: {
-    resetGame(text) {
-      this.viewModal(text);
+    resetGame(message) {
+      this.viewModal(message);
       this.sequence = [];
       this.humanSequence = [];
       this.level = 0;
@@ -48,8 +48,7 @@ export default {
 
       this.setScore(0);
       this.viewStartBtn(true);
-      this.setInfo({ infoBoolean: false, message: '' });
-      return true;
+      this.setInfo({ show: false });
     },
     activeTileAfterClick(color) {
       this.setTileActive(true, color);
@@ -68,39 +67,40 @@ export default {
       this.activeTileAfterClick(tile);
       this.playSound(tile);
 
-      const remainingTaps = this.sequence.length - this.humanSequence.length;
-
-      if (this.gameOver(this.humanSequence, this.sequence, index)) return;
+      if (this.gameOver(index)) return;
 
       if (this.humanSequence.length === this.sequence.length) {
-        if (this.endGame(this.humanSequence)) return;
-        const message = 'Success! Keep going!';
-
+        if (this.endGame()) return;
         this.humanSequence = [];
-        this.setInfo({ infoBoolean: true, message });
+
+        const message = 'Success! Keep going!';
+        this.setInfo({ show: true, message });
 
         setTimeout(() => {
           this.nextRound();
         }, 1000);
         return;
       }
-      this.humanTurn(remainingTaps);
+
+      const remainingTaps = this.sequence.length - this.humanSequence.length;
+      this.humanTurnMessage(remainingTaps);
     },
-    endGame(humanSequence) {
-      if (humanSequence.length === this.totalLevels) {
-        return this.resetGame(`Congrats! You completed all ${this.totalLevels} levels`);
+    endGame() {
+      const condition = this.humanSequence.length === this.totalLevels;
+      const message = `Congrats! You completed all ${this.totalLevels} levels`;
+      return this.setGameOverCondition(condition, message);
+    },
+    gameOver(index) {
+      const condition = this.humanSequence[index] !== this.sequence[index];
+      const message = 'Oops! Game over';
+      return this.setGameOverCondition(condition, message);
+    },
+    setGameOverCondition(condition, message) {
+      if (condition) {
+        this.resetGame(message);
+        return true;
       }
       return false;
-    },
-    gameOver(humanSequence, sequence, index) {
-      if (humanSequence[index] !== sequence[index]) {
-        return this.resetGame('Oops! Game over');
-      }
-      return false;
-    },
-    setTileActive(boolean, color) {
-      this.isTileActive = boolean;
-      this.currentTile = color;
     },
     activateTile(color) {
       const tile = this.tileList.find(({ data }) => data === color);
@@ -116,7 +116,9 @@ export default {
       this.level += 1;
       this.score = this.level;
       this.setScore(this.score);
-      this.setInfo({ infoBoolean: true, message: 'Wait for the computer' });
+
+      const message = 'Wait for the computer';
+      this.setInfo({ show: true, message });
 
       const nextSequence = [...this.sequence];
       nextSequence.push(nextStep());
@@ -124,27 +126,31 @@ export default {
       this.sequence = [...nextSequence];
 
       setTimeout(() => {
-        this.humanTurn(this.level);
+        this.humanTurnMessage(this.level);
       }, this.level * sum(this.difficult, 1100) + sum(this.difficult, 1100));
     },
     setScore(value) {
-      eventEmitter.$emit('score', value);
+      eventEmitter.$emit('setScore', value);
     },
-    humanTurn(level) {
+    humanTurnMessage(level) {
       const message = `Your turn: ${level} Tap${level > 1 ? 's' : ''}`;
-      this.setInfo({ infoBoolean: true, message });
+      this.setInfo({ show: true, message });
     },
-    setInfo(message) {
-      eventEmitter.$emit('setInfo', message);
+    setTileActive(show, color) {
+      this.isTileActive = show;
+      this.currentTile = color;
     },
-    viewStartBtn(btnBoolean) {
-      eventEmitter.$emit('hideStartBtn', btnBoolean);
+    setInfo(settings) {
+      eventEmitter.$emit('setInfo', settings);
+    },
+    viewStartBtn(show) {
+      eventEmitter.$emit('viewStartBtn', show);
     },
     playSound(color) {
       eventEmitter.$emit('playSound', color);
     },
     viewModal(message) {
-      eventEmitter.$emit('view', message);
+      eventEmitter.$emit('viewModal', message);
     },
   },
 
