@@ -1,28 +1,32 @@
 <template>
-  <footer data-action="sound" ref="soundList">
+  <footer ref="soundList">
     <audio
       src="../../sounds/1.mp3"
-      data-sound="red"
+      ref="red"
     ></audio>
     <audio
       src="../../sounds/2.mp3"
-      data-sound="green"
+      ref="green"
     ></audio>
     <audio
       src="../../sounds/3.mp3"
-      data-sound="blue"
+      ref="blue"
     ></audio>
     <audio
       src="../../sounds/4.mp3"
-      data-sound="yellow"
+      ref="yellow"
     ></audio>
   </footer>
 </template>
 
 <script>
+import { eventEmitter } from '../../main';
+
 export default {
-  mounted() {
-    this.$emit('soundList', this.$refs.soundList);
+  created() {
+    eventEmitter.$on('playSound', (payload) => {
+      this.$refs[payload].play();
+    });
   },
 };
 </script>

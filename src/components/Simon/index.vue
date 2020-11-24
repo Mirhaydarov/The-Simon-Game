@@ -15,8 +15,6 @@
 import { sum } from './sum';
 import { nextStep } from './next-step';
 import { playRound } from './play-round';
-import { playSound } from './play-sound';
-import { filterSound } from './filter-sound';
 
 import { eventEmitter } from '../../main';
 
@@ -72,10 +70,9 @@ export default {
       const { tile } = target.dataset;
 
       const index = this.humanSequence.push(tile) - 1;
-      this.activeTileAfterClick(tile);
 
-      const sound = filterSound(this.soundList, tile);
-      playSound(sound);
+      this.activeTileAfterClick(tile);
+      this.playSound(tile);
 
       const remainingTaps = this.sequence.length - this.humanSequence.length;
 
@@ -113,10 +110,9 @@ export default {
     },
     activateTile(color) {
       const tile = this.tileList.find(({ data }) => data === color);
-      const sound = filterSound(this.soundList, color);
 
       this.setTileActive(true, tile.data);
-      playSound(sound);
+      this.playSound(color);
 
       setTimeout(() => {
         this.setTileActive(false, tile.data);
@@ -149,6 +145,9 @@ export default {
     },
     viewStartBtn(btnBoolean) {
       eventEmitter.$emit('hideStartBtn', btnBoolean);
+    },
+    playSound(color) {
+      eventEmitter.$emit('playSound', color);
     },
   },
 

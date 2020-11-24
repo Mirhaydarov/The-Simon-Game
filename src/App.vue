@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <Header />
-    <Simon :soundList="soundList" />
+    <Simon />
     <GameInfo />
     <GameOptions />
-    <SimonSound @soundList="soundList = $event" />
+    <SimonSound />
   </div>
 </template>
 
@@ -17,13 +17,6 @@ import SimonSound from './components/SimonSound/index.vue';
 
 export default {
   name: 'App',
-
-  data() {
-    return {
-      soundList: null,
-    };
-  },
-
   components: {
     Header,
     Simon,
