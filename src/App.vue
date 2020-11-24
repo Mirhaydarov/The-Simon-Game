@@ -4,6 +4,7 @@
     <Simon />
     <GameInfo />
     <GameOptions />
+    <Popup />
     <SimonSound />
   </div>
 </template>
@@ -13,6 +14,7 @@ import Header from './components/Title/index.vue';
 import Simon from './components/Simon/index.vue';
 import GameInfo from './components/GameInfo/index.vue';
 import GameOptions from './components/GameOptions/index.vue';
+import Popup from './components/Popup/index.vue';
 import SimonSound from './components/SimonSound/index.vue';
 
 export default {
@@ -23,6 +25,7 @@ export default {
     GameInfo,
     GameOptions,
     SimonSound,
+    Popup,
   },
 };
 </script>

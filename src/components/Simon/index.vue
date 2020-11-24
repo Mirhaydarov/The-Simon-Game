@@ -46,7 +46,7 @@ export default {
 
   methods: {
     resetGame(text) {
-      alert(text);
+      this.viewModal(text);
       this.sequence = [];
       this.humanSequence = [];
       this.level = 0;
@@ -148,6 +148,9 @@ export default {
     },
     playSound(color) {
       eventEmitter.$emit('playSound', color);
+    },
+    viewModal(message) {
+      eventEmitter.$emit('view', message);
     },
   },
 
