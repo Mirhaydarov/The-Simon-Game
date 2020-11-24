@@ -2,11 +2,11 @@
   <main class="simon" @click="handleClick($event.target)">
     <ul ref="tileList">
       <li
-        v-for="{ className, data } of tileList"
+        v-for="({ className, data }) of tileList"
         :key="data"
-        :class="className"
+        :class="[className, { 'active': (currentTile === data && isTileActive) }]"
         :data-tile="data"
-      ></li>
+      >{{ currentTile }}</li>
     </ul>
   </main>
 </template>
@@ -16,7 +16,6 @@ import { sum } from './sum';
 import { nextStep } from './next-step';
 import { playRound } from './play-round';
 import { playSound } from './play-sound';
-import { filterTile } from './filter-tile';
 import { filterSound } from './filter-sound';
 
 import { eventEmitter } from '../../main';
@@ -36,6 +35,8 @@ export default {
         { className: 'yellow', data: 'yellow' },
         { className: 'green', data: 'green' },
       ],
+      currentTile: '',
+      isTileActive: false,
       score: 0,
       level: 0,
       sequence: [],
@@ -58,12 +59,11 @@ export default {
       this.setInfo({ infoBoolean: false, message: '' });
       return true;
     },
-    activeTileAfterClick(tileList, tiles) {
-      const tile = filterTile(tileList, tiles);
-      tile.classList.add('active');
+    activeTileAfterClick(color) {
+      this.setTileActive(true, color);
 
       setTimeout(() => {
-        tile.classList.remove('active');
+        this.setTileActive(false, color);
       }, 100);
     },
     handleClick(target) {
@@ -72,7 +72,7 @@ export default {
       const { tile } = target.dataset;
 
       const index = this.humanSequence.push(tile) - 1;
-      this.activeTileAfterClick(this.$refs.tileList, tile);
+      this.activeTileAfterClick(tile);
 
       const sound = filterSound(this.soundList, tile);
       playSound(sound);
@@ -107,15 +107,19 @@ export default {
       }
       return false;
     },
+    setTileActive(boolean, color) {
+      this.isTileActive = boolean;
+      this.currentTile = color;
+    },
     activateTile(color) {
-      const tile = filterTile(this.$refs.tileList, color);
+      const tile = this.tileList.find(({ data }) => data === color);
       const sound = filterSound(this.soundList, color);
 
-      tile.classList.add('active');
+      this.setTileActive(true, tile.data);
       playSound(sound);
 
       setTimeout(() => {
-        tile.classList.remove('active');
+        this.setTileActive(false, tile.data);
       }, sum(this.difficult, 1000));
     },
     nextRound() {
